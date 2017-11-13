@@ -5,11 +5,15 @@ import math
 
 num_routers = 50
 routers = []
-router_range = 20
+router_range = 35
 sender_index = 0
 receiver_index = 0
 visited = []
 done = False
+
+
+def find_distance(x1, x2, y1, y2):
+    return math.sqrt((x2-x1)**2 + (y2-y1)**2)
 
 
 def least_cost(s, n):
@@ -60,7 +64,7 @@ class Router(threading.Thread):
 
     def find_neighbours(self):
         for item in routers:
-            if self.index != item.index and abs(self.x - item.x) <= 20 and abs(self.y - item.y) <= 20:
+            if self.index != item.index and find_distance(self.x, item.x, self.y, item.y) <= 20:
                 self.neighbours.append(item.index)
 
     def print_status(self):
