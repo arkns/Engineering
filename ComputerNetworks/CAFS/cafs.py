@@ -10,22 +10,44 @@ sender_index = 0
 receiver_index = 0
 visited = []
 done = False
-
+rho=0.7
 
 def least_cost(s, n):
-    distance = {}
+    cost = {}
+
+    xi=routers[s].x
+    yi=routers[s].y
+    global dest
+    xdest=routers[dest].x
+    ydest=routers[dest].y
+    did=math.sqrt((xdest-xi)**2+(ydest-yi)**2)
+    theta=math.acos(20/(2*did))
     while 1:
         for item in n:
-            distance[item] = math.sqrt((routers[s].x - routers[item].x)**2 + (routers[s].y - routers[item].y)**2)
-        if distance == {}:
+            xj=routers[item].x
+            yj=routers[item].y
+
+            djd=math.sqrt((xdest-xj)**2+(ydest-yj)**2)
+            dij=math.sqrt((xi-xj)**2+(yi-yj)**2)
+            pij=(did-djd)/did
+            ax=xi-xj
+            ay=yi-yj
+            bx=xdest-xi
+            by=ydest-yi
+            ab=ax*bx+ay*by
+            alphaj=math.acos(abs(ab/(dij*did)))
+            Aj=alphaj/theta
+            Eij=dij**2/400
+            cost[item] = (Eij*Aj*rho)/pij
+        if cost == {}:
             return -1
-        ind = min(distance, key=distance.get)
+        ind = min(cost, key=cost.get)
         print(ind)
         print(visited)
         print(n)
         if ind in visited:
             del n[n.index(ind)]
-            del distance[ind]
+            del cost[ind]
         else:
             #visited.append(ind)
             return ind
@@ -99,11 +121,14 @@ def main():
     print("Welcome.")
     for i in range(num_routers):
         routers.append(Router(i, random.randint(1, 99), random.randint(1, 99)))
-    global sender_index, receiver_index
+    global sender_index, receiver_index, source, dest
     sender_index = random.randint(0, num_routers-1)
+    source = sender_index
+
     while 1:
         receiver_index = random.randint(0, num_routers-1)
         if receiver_index != sender_index:
+            dest=receiver_index
             break
     routers[sender_index].set_as_sender()
     routers[receiver_index].set_as_receiver()
